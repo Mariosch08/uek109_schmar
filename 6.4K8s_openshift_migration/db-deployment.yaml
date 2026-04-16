@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: wordpress-inv
+  labels:
+    app: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: mariadb
+        image: bitnami/mariadb:sha256-6eb6f7de1415ff263d132d228af5428db7eb652088461cf692a5dc5a264876f7
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MARIADB_DATABASE
+          value: wordpress
+        - name: MARIADB_USER
+          value: wordpress
+        - name: MARIADB_PASSWORD
+          value: wordpress
+        - name: MARIADB_ROOT_PASSWORD
+          value: rootpassword
+
+        volumeMounts:
+        - name: db-storage
+          mountPath: /bitnami/mariadb
+
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: db-pvc
